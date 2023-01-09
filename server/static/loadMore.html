@@ -1,0 +1,87 @@
+{{define "loadMore"}}
+    <button id="load-more" onclick="loadMore()">Load More</button>
+
+    <script>
+        function MediaAlbum(data, extra) {
+            this.data = data;
+            this.extra = extra;
+        }
+
+        function Extra(offset, isLast) {
+            this.offset = offset;
+            this.isLast = isLast;
+        }
+
+        function Data(mediaPosts) {
+            this.mediaPosts = mediaPosts;
+        }
+
+        function MediaPost(media, post) {
+            this.media = media;
+            this.post = post;
+        }
+
+        function Media(height, type, width, url, id, rendition) {
+            this.height = height;
+            this.type = type;
+            this.width = width;
+            this.url = url;
+            this.id = id;
+            this.rendition = rendition;
+        }
+
+        function Post(id, signedQuery, price, teaser, hasAccess, subscriptionLevelId, title) {
+            this.id = id;
+            this.signedQuery = signedQuery;
+            this.price = price;
+            this.teaser = teaser;
+            this.hasAccess = hasAccess;
+            this.subscriptionLevelId = subscriptionLevelId;
+            this.title = title;
+        }
+
+        function Teaser(height, width, type, url, id, rendition) {
+            this.height = height;
+            this.width = width;
+            this.type = type;
+            this.url = url;
+            this.id = id;
+            this.rendition = rendition;
+        }
+        const imgUrl = "https://images.boosty.to/image/"
+        const urlParams = new URLSearchParams(window.location.searchParams);
+        function loadMore() {
+            let offset = urlParams.has('offset') ? urlParams.get('offset') : {{ .Offset }};
+            let xurl = "/api/v1/album/" + {{ .Username }} + "?offset=" + offset;
+            // Fetch the next page of item.data and append it to the list
+            fetch(xurl)
+                .then(response => response.json())
+                .then(item => {
+                    console.log(item.res)
+                    urlParams.set('offset', item.res.extra.offset);
+                    for (let mediaPost of item.res.data.mediaPosts) {
+                        const el = document.createElement('li');
+                        const title = document.createElement('h2');
+                        title.innerText = mediaPost.post.title
+                        const price = document.createElement('p');
+                        price.innerText = mediaPost.post.price
+                        const teaser = document.createElement('img');
+                        teaser.src = mediaPost.post.teaser.length > 0 ? imgUrl+mediaPost.media[0].id : mediaPost.media[0].url
+                        teaser.alt = ""
+                        teaser.width = 400
+                        teaser.height = 600
+                        el.appendChild(title)
+                        el.appendChild(price)
+                        el.appendChild(teaser)
+                        document.querySelector('#item-list').appendChild(el);
+                    }
+                    let x = document.getElementById("load-more");
+                    if (x.style.display === "none" && item.res.extra.isLast) {
+                        x.style.display = "block";
+                    } else {
+                        x.style.display = "none";
+                    }
+                });
+        }
+    </script>
+{{end}}

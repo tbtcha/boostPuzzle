@@ -1,0 +1,34 @@
+{{define "index"}}
+{{template "header"}}
+
+<main>
+    <h1>Cover your page.</h1>
+    <p>
+        Lorem
+    </p>
+    <div id="posts">
+        <ul id="item-list">
+    {{range .MediaPosts}}
+            <li>
+                <h2>{{.Post.Title}}</h2>
+                <p>{{.Post.Price}}</p>
+                {{$lenTeaser := len .Post.Teaser}}
+                <img src="{{if gt $lenTeaser 0}}
+                            {{$urlTeaser := index .Post.Teaser 0}}
+                            {{$urlTeaser.Url}}
+                                {{else}}
+                                    {{$urlTeaser := index .Media 0}}
+                                    {{$urlTeaser.Url}}
+                {{end}}" alt="" height="600" width="400">
+            </li>
+
+    {{else}}
+    <p> Nope</p>
+    {{end}}
+        </ul>
+    </div>
+    {{template "loadMore" .LoadMore}}
+</main>
+
+{{template "footer"}}
+{{end}}
